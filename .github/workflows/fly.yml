@@ -19,6 +19,7 @@ jobs:
             command: test
             # args: --release --all-features
   deploy:
+      needs: test
       name: Deploy app
       runs-on: ubuntu-latest
       steps:
