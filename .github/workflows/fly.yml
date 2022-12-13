@@ -9,14 +9,15 @@ jobs:
   test:
       name: Test app
       runs-on: ubuntu-latest
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          # args: --release --all-features
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+        - uses: actions-rs/cargo@v1
+          with:
+            command: test
+            # args: --release --all-features
   deploy:
       name: Deploy app
       runs-on: ubuntu-latest
