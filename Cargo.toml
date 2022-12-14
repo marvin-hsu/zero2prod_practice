@@ -14,3 +14,4 @@ name = "zero2prod_practice"
 actix-web = "4.2.1"
 tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread"] }
 reqwest = "0.11"
+serde = { version = "1", features = ["derive"]}
