@@ -18,7 +18,7 @@ jobs:
         - name: Migrate database
           run: |
             sudo apt-get install libpq-dev -y
-            cargo install sqlx-cli --no-default-features --features postgres
+            cargo install sqlx-cli
             sqlx migrate run
   test:
       needs: database-migration
