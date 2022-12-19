@@ -69,7 +69,7 @@ async fn subscribe_return_a_400_when_data_is_missing() {
     ];
 
     // Act
-    for (invalid_body, error_msg) in test_cases {
+    for (invalid_body, _error_msg) in test_cases {
         let response = client
             .post(format!("{}/subscriptions", &app.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
