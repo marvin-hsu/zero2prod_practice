@@ -13,7 +13,6 @@ pub struct FormData {
 name = "Adding a new subscriber",
 skip(_form, db_pool),
 fields(
-request_id = %Uuid::new_v4(),
 subscriber_email = %_form.email,
 subscriber_name= %_form.name
 )
