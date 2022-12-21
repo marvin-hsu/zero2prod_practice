@@ -67,27 +67,21 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         config::File::from(configuration_directory.join(environment.as_str())).required(true),
     )?;
 
-    settings.try_into()
-}
+    settings.merge(config::Environment::with_prefix("app").separator("__"))?;
 
-pub fn get_connection_string() -> Secret<String> {
-    Secret::new(std::env::var("DATABASE_URL").expect("Failed to parse DATABASE_URL."))
+    settings.try_into()
 }
 
 impl DatabaseSettings {
     pub fn connection_string(&self) -> Secret<String> {
-        Secret::new(format!("{}/{}",
-        std::env::var("DATABASE_URL").expect("Failed to parse DATABASE_URL."),
-        self.database_name
-    ))
-        // Secret::new(format!(
-        //     "postgres://{}:{}@{}:{}/{}",
-        //     self.username,
-        //     self.password.expose_secret(),
-        //     self.host,
-        //     self.port,
-        //     self.database_name
-        // ))
+        Secret::new(format!(
+            "postgres://{}:{}@{}:{}/{}",
+            self.username,
+            self.password.expose_secret(),
+            self.host,
+            self.port,
+            self.database_name
+        ))
     }
 
     pub fn connection_string_without_db(&self) -> Secret<String> {
