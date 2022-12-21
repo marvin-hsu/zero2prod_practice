@@ -7,7 +7,7 @@ env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   APP_ENVIRONMENT: production
-  APP_TEST_TEST: ${{ secrets.TEST_TEST}}
+  APP_TEST__TEST: ${{ secrets.TEST_TEST}}
 jobs:
   # database-migration:
   #     name: Database migration
