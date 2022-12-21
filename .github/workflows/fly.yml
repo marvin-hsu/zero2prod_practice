@@ -7,23 +7,27 @@ env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   APP_ENVIRONMENT: production
-  app_TEST: testword
+  APP_DATABASE__USERNAME: ${{ secrets.DATABASE_USERNAME }}
+  APP_DATABASE__PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+  APP_DATABASE__HOST: ${{ secrets.DATABASE_HOST }}
+  APP_DATABASE__PORT: ${{ secrets.DATABASE_PORT }}
+  APP_DATABASE__DATABASE_NAME: ${{ secrets.DATABASE_DATABASE_NAME }}
 jobs:
-  # database-migration:
-  #     name: Database migration
-  #     runs-on: ubuntu-latest
-  #     steps:
-  #       - uses: actions/checkout@v2
-  #       - uses: actions-rs/toolchain@v1
-  #         with:
-  #           toolchain: stable
-  #       - name: Migrate database
-  #         run: |
-  #           sudo apt-get install libpq-dev -y
-  #           cargo install sqlx-cli
-  #           sqlx migrate run
+  database-migration:
+      name: Database migration
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+        - name: Migrate database
+          run: |
+            sudo apt-get install libpq-dev -y
+            cargo install sqlx-cli
+            sqlx migrate run
   test:
-      # needs: database-migration
+      needs: database-migration
       name: Test app
       runs-on: ubuntu-latest
       steps:
