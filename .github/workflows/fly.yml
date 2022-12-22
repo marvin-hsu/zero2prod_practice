@@ -13,33 +13,33 @@ env:
   APP_DATABASE__PORT: ${{ secrets.DATABASE_PORT }}
   APP_DATABASE__DATABASE_NAME: ${{ secrets.DATABASE_DATABASE_NAME }}
 jobs:
-  # database-migration:
-  #     name: Database migration
-  #     runs-on: ubuntu-latest
-  #     steps:
-  #       - uses: actions/checkout@v2
-  #       - uses: actions-rs/toolchain@v1
-  #         with:
-  #           toolchain: stable
-  #       - name: Migrate database
-  #         run: |
-  #           sudo apt-get install libpq-dev -y
-  #           cargo install sqlx-cli
-  #           sqlx migrate run
-  # test:
-  #     needs: database-migration
-  #     name: Test app
-  #     runs-on: ubuntu-latest
-  #     steps:
-  #       - uses: actions/checkout@v2
-  #       - uses: actions-rs/toolchain@v1
-  #         with:
-  #           toolchain: stable
-  #       - uses: actions-rs/cargo@v1
-  #         with:
-  #           command: test
+  database-migration:
+      name: Database migration
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+        - name: Migrate database
+          run: |
+            sudo apt-get install libpq-dev -y
+            cargo install sqlx-cli
+            sqlx migrate run
+  test:
+      needs: database-migration
+      name: Test app
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
+        - uses: actions-rs/cargo@v1
+          with:
+            command: test
   deploy:
-      # needs: test
+      needs: test
       name: Deploy app
       runs-on: ubuntu-latest
       steps:
