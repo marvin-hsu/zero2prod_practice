@@ -12,6 +12,7 @@ env:
   APP_DATABASE__HOST: ${{ secrets.DATABASE_HOST }}
   APP_DATABASE__PORT: ${{ secrets.DATABASE_PORT }}
   APP_DATABASE__DATABASE_NAME: ${{ secrets.DATABASE_DATABASE_NAME }}
+  APP_EMAIL_CLIENT__AUTHORIZATION_TOKEN: ${{ secrets.EMAIL_CLIENT_AUTHORIZATION_TOKEN }}
 jobs:
   database-migration:
       name: Database migration
