@@ -13,7 +13,7 @@ name = "zero2prod_practice"
 [dependencies]
 actix-web = "4.2.1"
 tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread"] }
-reqwest = "0.11"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 config = "0.11"
 uuid = { version = "0.8.1", features = ["v4"] }
@@ -44,3 +44,8 @@ features = [
     "migrate",
     "offline"
 ]
+
+[dev-dependencies]
+tokio = { version = "1.23.0", features = ["rt", "macros"] }
+wiremock = "0.5"
+fake = "2.5.0"

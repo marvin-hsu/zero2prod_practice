@@ -1,4 +1,4 @@
-use super::{SubscriberName, SubscriberEmail};
+use super::{SubscriberEmail, SubscriberName};
 
 pub struct NewSubscriber {
     pub email: SubscriberEmail,
