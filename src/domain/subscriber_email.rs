@@ -21,7 +21,7 @@ impl AsRef<str> for SubscriberEmail {
 
 #[cfg(test)]
 mod tests {
-    use claim::assert_err;
+    use claims::assert_err;
 
     use crate::domain::SubscriberEmail;
 
