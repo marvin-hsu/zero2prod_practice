@@ -7,20 +7,16 @@ pub struct EmailClient {
     http_client: Client,
     base_url: String,
     sender: SubscriberEmail,
-    authorization_token: Secret<String>,
+    bear_token: Secret<String>,
 }
 
 impl EmailClient {
-    pub fn new(
-        base_url: String,
-        sender: SubscriberEmail,
-        authorization_token: Secret<String>,
-    ) -> Self {
+    pub fn new(base_url: String, sender: SubscriberEmail, bear_token: Secret<String>) -> Self {
         Self {
             http_client: Client::new(),
             base_url,
             sender,
-            authorization_token,
+            bear_token,
         }
     }
 
@@ -28,23 +24,28 @@ impl EmailClient {
         &self,
         recipient: SubscriberEmail,
         subject: &str,
-        html_content: &str,
-        text_content: &str,
+        content_type: &str,
+        content: &str,
     ) -> Result<(), reqwest::Error> {
-        let url = format!("{}/email", self.base_url);
+        let url = format!("{}/v3/mail/send", self.base_url);
         let request_body = SendEmailRequest {
-            from: self.sender.as_ref().to_owned(),
-            to: recipient.as_ref().to_owned(),
-            subject: subject.to_owned(),
-            html_body: html_content.to_owned(),
-            text_body: text_content.to_owned(),
+            from: Email {
+                email: self.sender.as_ref().to_owned(),
+            },
+            personalizations: vec![Personalization {
+                to: vec![Email {
+                    email: recipient.as_ref().to_owned(),
+                }],
+                subject: subject.to_owned(),
+            }],
+            content: vec![Content {
+                type_field: content_type.to_owned(),
+                value: content.to_owned(),
+            }],
         };
         self.http_client
             .post(&url)
-            .header(
-                "X-Postmark-Server-Token",
-                self.authorization_token.expose_secret(),
-            )
+            .bearer_auth(self.bear_token.expose_secret())
             .json(&request_body)
             .send()
             .await?;
@@ -53,12 +54,28 @@ impl EmailClient {
 }
 
 #[derive(serde::Serialize)]
-struct SendEmailRequest {
-    from: String,
-    to: String,
-    subject: String,
-    html_body: String,
-    text_body: String,
+pub struct SendEmailRequest {
+    pub personalizations: Vec<Personalization>,
+    pub content: Vec<Content>,
+    pub from: Email,
+}
+
+#[derive(serde::Serialize)]
+pub struct Personalization {
+    pub to: Vec<Email>,
+    pub subject: String,
+}
+
+#[derive(serde::Serialize)]
+pub struct Email {
+    pub email: String,
+}
+
+#[derive(serde::Serialize)]
+pub struct Content {
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub value: String,
 }
 
 #[cfg(test)]
@@ -67,7 +84,7 @@ mod tests {
     use fake::Faker;
     use fake::{faker::internet::en::SafeEmail, Fake};
     use secrecy::Secret;
-    use wiremock::matchers::{header_exists, header, path, method};
+    use wiremock::matchers::{bearer_token, header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
     use crate::{domain::SubscriberEmail, email_client::EmailClient};
@@ -77,11 +94,12 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
+        let token: String = Faker.fake();
+        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(token.clone()));
 
-        Mock::given(header_exists("X-Postmark-Server-Token"))
+        Mock::given(bearer_token(token))
             .and(header("Content-Type", "application/json"))
-            .and(path("/email"))
+            .and(path("/v3/mail/send"))
             .and(method("POST"))
             .respond_with(ResponseTemplate::new(200))
             .expect(1)
@@ -90,11 +108,12 @@ mod tests {
 
         let subscriber_email = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
         let subject: String = Sentence(1..2).fake();
+        let content_type: String = Paragraph(1..2).fake();
         let content: String = Paragraph(1..10).fake();
 
         // Act
         let _ = email_client
-            .send_email(subscriber_email, &subject, &content, &content)
+            .send_email(subscriber_email, &subject, &content_type, &content)
             .await;
     }
 }

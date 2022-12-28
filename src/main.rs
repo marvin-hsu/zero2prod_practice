@@ -3,7 +3,7 @@ use std::net::TcpListener;
 use secrecy::ExposeSecret;
 use sqlx::PgPool;
 use zero2prod_practice::configuration::get_configuration;
-use zero2prod_practice::email_client::{self, EmailClient};
+use zero2prod_practice::email_client::EmailClient;
 use zero2prod_practice::startup::run;
 use zero2prod_practice::telemetry::{get_subscriber, init_subscriber};
 
@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     let email_client = EmailClient::new(
         configuration.email_client.base_url,
         sender_email,
-        configuration.email_client.authorization_token,
+        configuration.email_client.bear_token,
     );
 
     let address = format!(
