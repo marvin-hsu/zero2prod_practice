@@ -136,7 +136,6 @@ mod tests {
         let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
 
         Mock::given(any())
-            // Not a 200 anymore!
             .respond_with(ResponseTemplate::new(500))
             .expect(1)
             .mount(&mock_server)
@@ -165,7 +164,6 @@ mod tests {
 
         let response = ResponseTemplate::new(200).set_delay(std::time::Duration::from_secs(180));
         Mock::given(any())
-            // Not a 200 anymore!
             .respond_with(response)
             .expect(1)
             .mount(&mock_server)
