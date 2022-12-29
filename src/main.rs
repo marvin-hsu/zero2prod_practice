@@ -1,10 +1,5 @@
-use std::net::TcpListener;
-
-use secrecy::ExposeSecret;
-use sqlx::PgPool;
 use zero2prod_practice::configuration::get_configuration;
-use zero2prod_practice::email_client::EmailClient;
-use zero2prod_practice::startup::run;
+use zero2prod_practice::startup::Application;
 use zero2prod_practice::telemetry::{get_subscriber, init_subscriber};
 
 #[tokio::main]
@@ -13,27 +8,7 @@ async fn main() -> std::io::Result<()> {
     init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration");
-    let connection_pool =
-        PgPool::connect_lazy(&configuration.database.connection_string().expose_secret())
-            .expect("Failed to connection to Postgres.");
-
-    let sender_email = configuration
-        .email_client
-        .sender()
-        .expect("Invalid sender email address.");
-    let timeout = configuration.email_client.timeout();
-    let email_client = EmailClient::new(
-        configuration.email_client.base_url,
-        sender_email,
-        configuration.email_client.bear_token,
-        timeout,
-    );
-
-    let address = format!(
-        "{}:{}",
-        configuration.application.host, configuration.application.port
-    );
-
-    let listener = TcpListener::bind(address)?;
-    run(listener, connection_pool, email_client)?.await
+    let application = Application::build(configuration).await?;
+    application.run_until_stopped().await?;
+    Ok(())
 }
