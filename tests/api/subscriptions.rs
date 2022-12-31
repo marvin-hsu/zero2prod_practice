@@ -131,7 +131,7 @@ async fn subscribe_sends_a_confirmation_email_with_a_link() {
         .get("value")
         .unwrap()
         .to_string();
- 
+
     let links: Vec<_> = linkify::LinkFinder::new()
         .links(&content)
         .filter(|l| *l.kind() == linkify::LinkKind::Url)
