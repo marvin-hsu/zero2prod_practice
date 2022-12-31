@@ -27,6 +27,7 @@ jobs:
             sudo apt-get install libpq-dev -y
             cargo install sqlx-cli
             sqlx migrate run
+            cargo sqlx prepare -- --lib
   test:
       needs: database-migration
       name: Test app
