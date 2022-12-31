@@ -43,7 +43,6 @@ async fn the_link_return_by_subscribe_returns_a_200_if_called() {
         .filter(|l| *l.kind() == linkify::LinkKind::Url)
         .collect();
     let mut confirmation_link = Url::parse(links[0].as_str()).unwrap();
-    assert_eq!(confirmation_link.host_str().unwrap(), "127.0.0.1");
     confirmation_link.set_port(Some(app.port)).unwrap();
 
     let response = reqwest::get(confirmation_link).await.unwrap();
