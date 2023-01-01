@@ -2,7 +2,7 @@ use actix_web::{web, HttpResponse, ResponseError};
 use chrono::Utc;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use reqwest::StatusCode;
-use sqlx::{Error, PgPool, Postgres, Transaction};
+use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
 use crate::{
@@ -175,7 +175,7 @@ impl std::fmt::Display for SubscribeError{
 impl ResponseError for SubscribeError {
     fn status_code(&self) -> StatusCode {
         match self {
-            SubscribeError::DatabaseError(_) => StatusCode::BAD_REQUEST,
+            SubscribeError::ValidationError(_) => StatusCode::BAD_REQUEST,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
