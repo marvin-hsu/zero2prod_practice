@@ -37,7 +37,7 @@ pub async fn subscribe(
     let subscription_token = generate_subscription_token();
     store_token(&mut transaction, subscriber_id, &subscription_token).await?;
 
-    transaction.commit();
+    transaction.commit().await?;
     send_confirmation_email(
         &email_client,
         new_subscriber,
